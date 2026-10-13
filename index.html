@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Ajar Meihua 3 - Unit 5: 新年好!</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-100 via-amber-50 to-orange-100 min-h-screen text-gray-800 flex flex-col justify-between" oncopy="return false" oncut="return false" onpaste="return false">
+
+    <header class="bg-red-600 text-white shadow-lg py-4 px-6 rounded-b-3xl">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+                    🧧 <span>Unit 5: 新年好 (Xīnnián hǎo!)</span>
+                </h1>
+                <p class="text-red-200 text-sm mt-1">Belajar Bahasa Mandarin Kelas 3 SD secara Interaktif</p>
+            </div>
+            <div id="player-display" class="bg-red-700 px-4 py-2 rounded-xl text-sm font-semibold shadow border border-red-500 hidden">
+                Pemain: <span id="lbl-player-name" class="text-yellow-300 font-bold"></span> | Poin: <span id="lbl-total-points" class="text-yellow-300 font-bold">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl w-full mx-auto p-4 sm:p-6 flex-grow">
+
+        <!-- Login / Nama Pemain Modal Screen -->
+        <div id="screen-login" class="bg-white/90 backdrop-blur rounded-3xl p-6 sm:p-10 shadow-xl text-center max-w-md mx-auto my-12 border-4 border-red-400">
+            <div class="text-5xl mb-4">🏮</div>
+            <h2 class="text-2xl font-bold text-red-600 mb-2">Selamat Datang!</h2>
+            <p class="text-gray-600 mb-6 text-sm">Masukkan nama lengkapmu untuk mulai belajar & bermain kuis kosakata Unit 5.</p>
+            <input type="text" id="input-player-name" placeholder="Ketik nama kamu di sini..." class="w-full px-4 py-3 rounded-2xl border-2 border-red-300 focus:outline-none focus:border-red-500 text-center font-semibold text-lg mb-4 shadow-inner">
+            <button onclick="startGame()" class="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transform transition active:scale-95">
+                Mulai Belajar 🚀
+            </button>
+        </div>
+
+        <!-- Main Dashboard App (Hidden initially) -->
+        <div id="screen-app" class="hidden">
+            <!-- Navigation Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 mb-6 bg-white/60 p-2 rounded-2xl shadow-sm border border-red-200">
+                <button onclick="switchTab('flashcard')" id="btn-tab-flashcard" class="tab-btn px-4 py-2 rounded-xl font-bold text-sm bg-red-600 text-white shadow transition">
+                    🃏 Flashcard Kosakata
+                </button>
+                <button onclick="switchTab('quiz')" id="btn-tab-quiz" class="tab-btn px-4 py-2 rounded-xl font-bold text-sm bg-white text-gray-700 hover:bg-red-100 transition">
+                    📝 Kuis Kosakata
+                </button>
+                <button onclick="switchTab('sentence')" id="btn-tab-sentence" class="tab-btn px-4 py-2 rounded-xl font-bold text-sm bg-white text-gray-700 hover:bg-red-100 transition">
+                    🧩 Melengkapi Kalimat
+                </button>
+                <button onclick="switchTab('stats')" id="btn-tab-stats" class="tab-btn px-4 py-2 rounded-xl font-bold text-sm bg-white text-gray-700 hover:bg-red-100 transition">
+                    🏆 Statistik & Skor
+                </button>
+            </div>
+
+            <!-- TAB 1: FLASHCARD -->
+            <div id="tab-flashcard" class="tab-content">
+                <div class="text-center mb-4">
+                    <h2 class="text-xl font-bold text-red-700">Kartu Kosakata Interaktif (Flashcard)</h2>
+                    <p class="text-sm text-gray-600">Klik kartu untuk melihat arti & pinyin! Setiap kartu yang dibalik memberi poin.</p>
+                </div>
+                
+                <div class="flex justify-center items-center my-6">
+                    <div class="relative w-full max-w-sm h-80 perspective-1000 cursor-pointer" onclick="flipCard()">
+                        <div id="flashcard-inner" class="w-full h-full relative transform-style-3d shadow-2xl rounded-3xl">
+                            <!-- Sisi Depan: Hanzi -->
+                            <div class="absolute inset-0 bg-gradient-to-br from-red-500 to-pink-600 rounded-3xl flex flex-col justify-center items-center p-6 text-white backface-hidden border-4 border-yellow-300">
+                                <span class="text-xs uppercase tracking-widest bg-red-700 px-3 py-1 rounded-full mb-4 text-yellow-200">Kosakata #<span id="fc-index">1</span></span>
+                                <div id="fc-hanzi" class="text-6xl sm:text-7xl font-bold mb-4 drop-shadow-md">新年</div>
+                                <p class="text-sm text-red-100 italic">Klik kartu untuk membalik 👆</p>
+                            </div>
+                            <!-- Sisi Belakang: Pinyin & Arti -->
+                            <div class="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-200 rounded-3xl flex flex-col justify-center items-center p-6 text-gray-800 transform-style-3d rotate-y-180 backface-hidden border-4 border-red-400">
+                                <span class="text-xs uppercase tracking-widest bg-red-600 text-white px-3 py-1 rounded-full mb-2">Arti & Pelafalan</span>
+                                <div id="fc-pinyin" class="text-2xl font-bold text-red-700 mb-2">xīnnián</div>
+                                <div id="fc-meaning" class="text-xl font-semibold text-gray-800 mb-4 text-center">tahun baru</div>
+                                <button onclick="event.stopPropagation(); playTTS()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow flex items-center gap-2 transition">
+                                    🔊 Dengar Suara
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kontrol Navigasi Flashcard -->
+                <div class="flex justify-center items-center gap-4 mt-4">
+                    <button onclick="prevCard()" class="bg-white hover:bg-red-50 text-red-600 font-bold px-5 py-2 rounded-2xl shadow border border-red-300 transition">
+                        ⬅️ Sebelumnya
+                    </button>
+                    <span id="fc-counter" class="font-bold text-gray-700">1 / 13</span>
+                    <button onclick="nextCard()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2 rounded-2xl shadow transition">
+                        Selanjutnya ➡️
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: KUIS KOSAKATA -->
+            <div id="tab-quiz" class="tab-content hidden">
+                <div class="bg-white rounded-3xl p-6 shadow-lg border-2 border-red-200 max-w-xl mx-auto">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <span class="text-sm font-bold text-red-600">Soal Kuis <span id="quiz-num">1</span>/5</span>
+                        <span class="text-sm font-bold text-gray-600">Skor: <span id="quiz-score" class="text-green-600">0</span></span>
+                    </div>
+                    <div class="text-center my-6">
+                        <p class="text-sm text-gray-500 mb-1">Pilih Hanzi yang tepat untuk:</p>
+                        <h3 id="quiz-prompt" class="text-2xl font-bold text-red-700 mb-2">tahun baru (xīnnián)</h3>
+                    </div>
+                    <div id="quiz-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <!-- Pilihan tombol opsi kuis -->
+                    </div>
+                    <div id="quiz-feedback" class="text-center font-bold text-lg hidden mt-4 p-2 rounded-xl"></div>
+                </div>
+            </div>
+
+            <!-- TAB 3: MELENGKAPI KALIMAT -->
+            <div id="tab-sentence" class="tab-content hidden">
+                <div class="bg-white rounded-3xl p-6 shadow-lg border-2 border-red-200 max-w-xl mx-auto">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <span class="text-sm font-bold text-red-600">Kalimat Rumpang <span id="sent-num">1</span>/4</span>
+                        <span class="text-sm font-bold text-gray-600">Skor: <span id="sent-score" class="text-green-600">0</span></span>
+                    </div>
+                    <div class="my-6">
+                        <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Lengkapi kalimat rumpang di bawah ini:</p>
+                        <div id="sent-prompt" class="text-xl font-bold text-gray-800 bg-red-50 p-4 rounded-2xl border border-red-200 text-center mb-4">
+                            <!-- Kalimat soal -->
+                        </div>
+                    </div>
+                    <div id="sent-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <!-- Opsi jawaban kalimat -->
+                    </div>
+                    <div id="sent-feedback" class="text-center font-bold text-lg hidden mt-4 p-2 rounded-xl"></div>
+                </div>
+            </div>
+
+            <!-- TAB 4: STATISTIK & SKOR -->
+            <div id="tab-stats" class="tab-content hidden">
+                <div class="bg-white rounded-3xl p-6 shadow-lg border-2 border-red-200 max-w-md mx-auto text-center">
+                    <div class="text-5xl mb-3">🏆</div>
+                    <h2 class="text-2xl font-bold text-red-600 mb-1">Laporan Belajar</h2>
+                    <p id="stats-player" class="text-gray-600 font-semibold mb-6">Nama: -</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-green-50 p-4 rounded-2xl border border-green-200">
+                            <span class="block text-sm text-green-600 font-bold">Jawaban Benar</span>
+                            <span id="stat-correct" class="text-3xl font-extrabold text-green-700">0</span>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-2xl border border-red-200">
+                            <span class="block text-sm text-red-600 font-bold">Jawaban Salah</span>
+                            <span id="stat-wrong" class="text-3xl font-extrabold text-red-700">0</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200 mb-6">
+                        <span class="block text-sm text-amber-700 font-bold">Total Poin Flashcard & Kuis</span>
+                        <span id="stat-points" class="text-4xl font-extrabold text-amber-600">0 Poin</span>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-6">
+                        <span class="block text-sm text-blue-700 font-bold">Skor Persentase (%)</span>
+                        <span id="stat-percentage" class="text-4xl font-extrabold text-blue-600">0%</span>
+                    </div>
+
+                    <button onclick="resetProgress()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-6 py-2 rounded-xl text-sm transition">
+                        🔄 Ulangi Permainan
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white/80 border-t border-red-200 py-3 text-center text-xs text-gray-500 font-semibold mt-8">
+        Modul Ajar Bahasa Mandarin Kelas 3 SD • Unit 5 新年好 • by lcnpalembang-08994477998
+    </footer>
+
+    <script>
+        const vocabulary = [
+            { hanzi: "新", pinyin: "xīn", meaning: "baru" },
+            { hanzi: "新年", pinyin: "xīnnián", meaning: "tahun baru" },
+            { hanzi: "新年好", pinyin: "xīnnián hǎo", meaning: "selamat tahun baru!" },
+            { hanzi: "祝贺", pinyin: "zhùhè", meaning: "mengucapkan selamat" },
+            { hanzi: "大家", pinyin: "dàjiā", meaning: "semua orang" },
+            { hanzi: "为什么", pinyin: "wèi shénme", meaning: "mengapa" },
+            { hanzi: "因为", pinyin: "yīnwèi", meaning: "karena" },
+            { hanzi: "红包", pinyin: "hóngbāo", meaning: "angpao / amplop merah" },
+            { hanzi: "穿", pinyin: "chuān", meaning: "memakai" },
+            { hanzi: "衣服", pinyin: "yīfu", meaning: "pakaian" },
+            { hanzi: "热闹", pinyin: "rènào", meaning: "ramai / meriah" },
+            { hanzi: "年糕", pinyin: "niángão", meaning: "kue keranjang / kue tahun baru" },
+            { hanzi: "呀", pinyin: "ya", meaning: "ya (partikel)" }
+        ];
+
+        const quizData = [
+            { prompt: "tahun baru (xīnnián)", answer: "新年", options: ["新年", "新", "祝贺", "大家"] },
+            { prompt: "mengapa (wèi shénme)", answer: "为什么", options: ["因为", "为什么", "热闹", "穿"] },
+            { prompt: "angpao / amplop merah (hóngbāo)", answer: "红包", options: ["衣服", "年糕", "红包", "新"] },
+            { prompt: "karena (yīnwèi)", answer: "因为", options: ["为什么", "祝贺", "大家", "因为"] },
+            { prompt: "ramai / meriah (rènào)", answer: "热闹", options: ["热闹", "衣服", "新年好", "呀"] }
+        ];
+
+        const sentenceData = [
+            { sentence: "你_____喜欢新年？ (Mengapa kamu suka tahun baru?)", answer: "为什么", options: ["为什么", "因为", "红包", "衣服"] },
+            { sentence: "_____有红包。 (Karena ada angpao.)", answer: "因为", options: ["为什么", "因为", "穿", "新"] },
+            { sentence: "祝贺大家_____！ (Selamat tahun baru!)", answer: "新年好", options: ["热闹", "年糕", "新年好", "大家"] },
+            { sentence: "妈妈给我一个大_____。 (Ibu memberiku satu angpao besar.)", answer: "红包", options: ["衣服", "红包", "年糕", "新"] }
+        ];
+
+        let playerName = "";
+        let totalPoints = 0;
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let viewedCards = new Set();
+
+        let currentQuizIndex = 0;
+        let currentSentIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        function startGame() {
+            const input = document.getElementById('input-player-name');
+            const name = input.value.trim();
+            if (!name) {
+                alert("Silakan masukkan nama kamu terlebih dahulu!");
+                return;
+            }
+            playerName = name;
+            document.getElementById('lbl-player-name').innerText = playerName;
+            document.getElementById('stats-player').innerText = "Nama: " + playerName;
+            
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-app').classList.remove('hidden');
+            document.getElementById('player-display').classList.remove('hidden');
+
+            loadFlashcard();
+            loadQuiz();
+            loadSentence();
+            updateStats();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-red-600', 'text-white');
+                el.classList.add('bg-white', 'text-gray-700');
+            });
+
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-tab-' + tabName);
+            activeBtn.classList.remove('bg-white', 'text-gray-700');
+            activeBtn.classList.add('bg-red-600', 'text-white');
+
+            if (tabName === 'stats') {
+                updateStats();
+            }
+        }
+
+        function loadFlashcard() {
+            const item = vocabulary[currentCardIndex];
+            document.getElementById('fc-index').innerText = currentCardIndex + 1;
+            document.getElementById('fc-hanzi').innerText = item.hanzi;
+            document.getElementById('fc-pinyin').innerText = item.pinyin;
+            document.getElementById('fc-meaning').innerText = item.meaning;
+            document.getElementById('fc-counter').innerText = (currentCardIndex + 1) + " / " + vocabulary.length;
+
+            if (isFlipped) {
+                flipCard(); // reset flip
+            }
+        }
+
+        function flipCard() {
+            const inner = document.getElementById('flashcard-inner');
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                inner.classList.add('rotate-y-180');
+                if (!viewedCards.has(currentCardIndex)) {
+                    viewedCards.add(currentCardIndex);
+                    totalPoints += 10;
+                    updateStats();
+                }
+            } else {
+                inner.classList.remove('rotate-y-180');
+            }
+        }
+
+        function nextCard() {
+            if (currentCardIndex < vocabulary.length - 1) {
+                currentCardIndex++;
+                loadFlashcard();
+            } else {
+                currentCardIndex = 0;
+                loadFlashcard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                loadFlashcard();
+            } else {
+                currentCardIndex = vocabulary.length - 1;
+                loadFlashcard();
+            }
+        }
+
+        function playTTS() {
+            const item = vocabulary[currentCardIndex];
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(item.hanzi);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8; // Pelan agar ramah anak SD
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Browser tidak mendukung fitur suara TTS.");
+            }
+        }
+
+        function loadQuiz() {
+            if (currentQuizIndex >= quizData.length) {
+                document.getElementById('tab-quiz').innerHTML = `
+                    <div class="bg-white rounded-3xl p-8 shadow-lg text-center max-w-md mx-auto border-2 border-red-200">
+                        <div class="text-5xl mb-3">🎉</div>
+                        <h3 class="text-2xl font-bold text-red-600 mb-2">Kuis Selesai!</h3>
+                        <p class="text-gray-600 mb-4">Hebat! Kamu telah menyelesaikan seluruh soal kuis kosakata.</p>
+                        <button onclick="resetQuiz()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2 rounded-xl">Ulangi Kuis</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const q = quizData[currentQuizIndex];
+            document.getElementById('quiz-num').innerText = currentQuizIndex + 1;
+            document.getElementById('quiz-prompt').innerText = q.prompt;
+            document.getElementById('quiz-score').innerText = correctCount;
+
+            const optContainer = document.getElementById('quiz-options');
+            optContainer.innerHTML = '';
+            
+            // Acak pilihan opsi
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-red-50 hover:bg-red-100 text-red-700 border-2 border-red-300 font-bold text-2xl py-4 rounded-2xl shadow transition transform active:scale-95";
+                btn.innerText = opt;
+                btn.onclick = () => checkQuizAnswer(opt, q.answer);
+                optContainer.appendChild(btn);
+            });
+
+            document.getElementById('quiz-feedback').classList.add('hidden');
+        }
+
+        function checkQuizAnswer(selected, correct) {
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selected === correct) {
+                feedback.className = "text-center font-bold text-lg mt-4 p-2 rounded-xl bg-green-100 text-green-700";
+                feedback.innerText = "Benar! Hebat sekali 🌟";
+                correctCount++;
+                totalPoints += 15;
+            } else {
+                feedback.className = "text-center font-bold text-lg mt-4 p-2 rounded-xl bg-red-100 text-red-700";
+                feedback.innerText = "Kurang tepat. Jawaban benar: " + correct;
+                wrongCount++;
+            }
+
+            updateStats();
+
+            setTimeout(() => {
+                currentQuizIndex++;
+                loadQuiz();
+            }, 1200);
+        }
+
+        function resetQuiz() {
+            currentQuizIndex = 0;
+            loadQuiz();
+        }
+
+        function loadSentence() {
+            if (currentSentIndex >= sentenceData.length) {
+                document.getElementById('tab-sentence').innerHTML = `
+                    <div class="bg-white rounded-3xl p-8 shadow-lg text-center max-w-md mx-auto border-2 border-red-200">
+                        <div class="text-5xl mb-3">🎓</div>
+                        <h3 class="text-2xl font-bold text-red-600 mb-2">Latihan Selesai!</h3>
+                        <p class="text-gray-600 mb-4">Luar biasa! Kamu pintar melengkapi kalimat Bahasa Mandarin.</p>
+                        <button onclick="resetSentence()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-2 rounded-xl">Ulangi Latihan</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const s = sentenceData[currentSentIndex];
+            document.getElementById('sent-num').innerText = currentSentIndex + 1;
+            document.getElementById('sent-prompt').innerText = s.sentence;
+            document.getElementById('sent-score').innerText = correctCount;
+
+            const optContainer = document.getElementById('sent-options');
+            optContainer.innerHTML = '';
+
+            const shuffledOptions = [...s.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-amber-50 hover:bg-amber-100 text-amber-800 border-2 border-amber-300 font-bold text-xl py-3 px-4 rounded-2xl shadow transition transform active:scale-95";
+                btn.innerText = opt;
+                btn.onclick = () => checkSentenceAnswer(opt, s.answer);
+                optContainer.appendChild(btn);
+            });
+
+            document.getElementById('sent-feedback').classList.add('hidden');
+        }
+
+        function checkSentenceAnswer(selected, correct) {
+            const feedback = document.getElementById('sent-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selected === correct) {
+                feedback.className = "text-center font-bold text-lg mt-4 p-2 rounded-xl bg-green-100 text-green-700";
+                feedback.innerText = "Benar! Pintar sekali 👏";
+                correctCount++;
+                totalPoints += 20;
+            } else {
+                feedback.className = "text-center font-bold text-lg mt-4 p-2 rounded-xl bg-red-100 text-red-700";
+                feedback.innerText = "Kurang tepat. Jawaban benar: " + correct;
+                wrongCount++;
+            }
+
+            updateStats();
+
+            setTimeout(() => {
+                currentSentIndex++;
+                loadSentence();
+            }, 1200);
+        }
+
+        function resetSentence() {
+            currentSentIndex = 0;
+            loadSentence();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-correct').innerText = correctCount;
+            document.getElementById('stat-wrong').innerText = wrongCount;
+            document.getElementById('stat-points').innerText = totalPoints + " Poin";
+            document.getElementById('lbl-total-points').innerText = totalPoints;
+
+            const totalAnswers = correctCount + wrongCount;
+            let percentage = 0;
+            if (totalAnswers > 0) {
+                percentage = Math.round((correctCount / totalAnswers) * 100);
+            }
+            document.getElementById('stat-percentage').innerText = percentage + "%";
+        }
+
+        function resetProgress() {
+            totalPoints = 0;
+            currentCardIndex = 0;
+            currentQuizIndex = 0;
+            currentSentIndex = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            viewedCards.clear();
+            loadFlashcard();
+            loadQuiz();
+            loadSentence();
+            updateStats();
+            switchTab('flashcard');
+        }
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('selectstart', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 'a' || event.key === 's')) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
